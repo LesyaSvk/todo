@@ -1,26 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+/* eslint-disable jsx-a11y/control-has-associated-label */
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { TodoApp } from './components/TodoApp/TodoApp';
 
-function App() {
+export const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/">
+        <Route index element={<TodoApp />} />
+        <Route path="/completed" element={<TodoApp />} />
+        <Route path="/active" element={<TodoApp />} />
+      </Route>
+      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<p>Page not found</p>} />
+    </Routes>
   );
-}
-
-export default App;
+};
