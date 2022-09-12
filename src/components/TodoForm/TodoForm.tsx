@@ -1,32 +1,56 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { TodoType } from '../../types/todoType';
+import { useForm } from "react-hook-form";
 
 type Props = {
-  addTask: (value: string) => void;
+  addTask: (newItem: TodoType) => void;
 };
 
 export const TodoForm: React.FC<Props> = ({ addTask }) => {
-  const [userInput, setUserInput] = useState('');
+  const {
+    register, 
+    handleSubmit,
+    reset,
+  } = useForm();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUserInput(event.target.value);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    addTask(userInput);
-    setUserInput('');
+  const onSubmit = (data: any) => {
+    
+    const newItem = {
+      id: +new Date(),
+      name: data.name,
+      title: data.todo,
+      completed: false,
+      time: new Date().toISOString().slice(0, 10),
+    };
+  
+    addTask(newItem);
+    reset({
+      todo: '',
+      name: '',
+    })
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <input
+        {...register("name", { required: true })}
+        type="text"
+        className="new-todo"
+        placeholder="What's your name?"
+      />
+      <input
+         {...register("todo", { required: true })}
         type="text"
         data-cy="createTodo"
         className="new-todo"
         placeholder="What needs to be done?"
-        value={userInput}
-        onChange={handleChange}
       />
+      <button 
+        type="submit"
+        style={{ display : "none" }} 
+      >
+        Submit
+      </button>
     </form>
   );
 };

@@ -10,6 +10,7 @@ export const TodoApp: React.FC = () => {
   const [todos, setTodos] = useState<TodoType[]>(useLocalStorage());
   const [visibleTodos, setVisibleTodos] = useState<TodoType[]>([]);
   const location = useLocation();
+  const notCompleted = todos.filter(todo => todo.completed === false);
 
   useEffect(() => (
     localStorage.setItem('todos', JSON.stringify(todos))
@@ -30,16 +31,8 @@ export const TodoApp: React.FC = () => {
     }
   }, [location, todos]);
 
-  const addTask = (userInput: string) => {
-    if (userInput.trim()) {
-      const newItem = {
-        id: +new Date(),
-        title: userInput,
-        completed: false,
-      };
-
-      setTodos([...todos, newItem]);
-    }
+  const addTask = (newItem: TodoType) => {
+    setTodos([...todos, newItem]);
   };
 
   const removeTask = (id: number) => {
@@ -80,8 +73,6 @@ export const TodoApp: React.FC = () => {
     )));
   }, [todos]);
 
-  const notCompleted = todos.filter(todo => todo.completed === false);
-
   const clearCompleted = () => {
     const onlyActive = todos.filter(todo => todo.completed === false);
 
@@ -118,9 +109,7 @@ export const TodoApp: React.FC = () => {
         <span className="todo-count" data-cy="todosCounter">
           {`${notCompleted.length} items left`}
         </span>
-
         <Filter />
-
         {notCompleted.length > 0 && (
           <button
             type="button"

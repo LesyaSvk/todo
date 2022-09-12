@@ -16,15 +16,16 @@ export const Todo: React.FC<Props> = ({
   toggleTask,
   onEditTitle,
 }) => {
-  const { title, completed, id } = todo;
+  const { title, name, completed, id, time } = todo;
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(title);
+  const [timer, setTime] = useState(time);
 
   const changeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
 
-  const modifyTodo = () => {
+  const  modifyTodo = () => {
     if (!value) {
       setValue(title);
       setIsEditing(false);
@@ -38,20 +39,26 @@ export const Todo: React.FC<Props> = ({
     };
 
     onEditTitle(modifiedTodo);
+    setTime(new Date().toISOString().slice(0, 10))
     setIsEditing(false);
   };
 
-  const checkPressedButton = (event:React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      setIsEditing(false);
-    }
-  };
-
-  const undoChanges = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setValue(title);
       setIsEditing(false);
     }
+
+    if (event.key === 'Enter') {
+      const modifiedTodo = {
+        ...todo,
+        title: value,
+      };
+  
+      onEditTitle(modifiedTodo);
+      setTime(new Date().toISOString().slice(0, 10))
+      setIsEditing(false);
+    } 
   };
 
   return (
@@ -61,30 +68,31 @@ export const Todo: React.FC<Props> = ({
           {
             completed,
           },
+          {
+            editing: isEditing && !completed,
+          }
         )}
       >
         <div className="view">
           <input
             type="checkbox"
             className="toggle"
+            id="toggle-view"
             checked={completed}
             onChange={() => toggleTask(id)}
           />
-          <label onDoubleClick={() => setIsEditing(true)}>
-            {isEditing
-              ? (
-                <input
-                  type="text"
-                  className={classNames({ editing: isEditing })}
-                  value={value}
-                  onChange={changeTitle}
-                  onBlur={modifyTodo}
-                  onKeyPress={checkPressedButton}
-                  onKeyDown={undoChanges}
-                  ref={input => input && input.focus()}
-                />
-              )
-              : <p>{title}</p>}
+          <label 
+            onDoubleClick={() => setIsEditing(true)}
+            role="presentation"
+            onKeyDown={() => {}}
+          >
+            <div className="box">
+              <span className="box_item">{name}</span>
+
+              <span className="box_item">{title}</span>
+              
+              <span className="box_item">{timer}</span>
+            </div>
           </label>
 
           <button
@@ -94,7 +102,15 @@ export const Todo: React.FC<Props> = ({
             onClick={() => removeTask(id)}
           />
         </div>
-        <input type="text" className="edit" />
+        <input 
+          type="text" 
+          className="edit" 
+          value={value}
+          onChange={changeTitle}
+          onBlur={modifyTodo}
+          onKeyDown={onKeyDown}
+          ref={input => input && input.focus()}
+          />
       </li>
     </>
   );
